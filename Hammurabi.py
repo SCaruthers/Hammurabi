@@ -11,7 +11,7 @@ def main():
     #king.print_summary()
     
     random.seed()
-    length_of_game = 3
+    length_of_game = 10
     # Start a 10 year rule:
     while (king.in_office and king.years_ruled<length_of_game):
         

@@ -11,9 +11,9 @@ def main():
     #king.print_summary()
     
     random.seed()
-    
+    length_of_game = 3
     # Start a 10 year rule:
-    while (king.in_office and king.years_ruled<10):
+    while (king.in_office and king.years_ruled<length_of_game):
         
         king.print_summary()
         # Ask 4 questions
@@ -70,8 +70,19 @@ def main():
 
     # End of while loop, either 10 years or impeached
     if king.in_office: 
-        king.print_final_summary()
-        print(king.so_so_message)
+        king.print_final_summary()  # skip if impeached!
+        
+        avg_starve_rate = king.percentage_death_rate
+        avg_land_wealth = king.acres_of_land / king.population
+        
+        if ((avg_starve_rate > 33) or (avg_land_wealth < 7)):
+            print(king.impeach_message)
+        elif ((avg_starve_rate > 10) or (avg_land_wealth < 9)):
+            print(king.bad_message)
+        elif ((avg_starve_rate > 3) or (avg_land_wealth < 10)):
+            print(king.so_so_message)
+        else:
+            print(king.great_message)
         
     print('\nTa ta for now.')
 
@@ -169,7 +180,7 @@ class Ruler():
     
     impeach_message ='Due to this extreme mismanagement you have not only\nbeen impeached and thrown out of office, but you have\nalso been declared "National Fink" !!'
     great_message = 'A fantastic performance!!!  Charlemange, Disraeli, and \nJefferson combined could not have done better!'
-    so_so_message = 'Your performance could have been somewhat better, but\nreally wasn\'t too bad at all.  '+str(random.randint(2,14))+' people would\ndearly like to see you assassinated but we all have our\ntrivial problems.'
+    so_so_message = 'Your performance could have been somewhat better, but\nreally wasn\'t too bad at all. '+str(random.randint(2,14))+' people would\ndearly like to see you assassinated but we all have our\ntrivial problems.'
     bad_message = 'Your heavy-handed performance smacks of Nero and Ivan IV.\nThe people (remaining) find you an unpleasant ruler, \nand, frankly, hate your guts!'
     
     def __init__(self, name=None):
@@ -189,6 +200,7 @@ class Ruler():
         self.bushels_fed = 0
         self.num_deaths = 0
         self.total_num_deaths = 0
+        self.percentage_death_rate = 0
         self.bushels_rats_ate = 200
         self.plague_flag = False
         
@@ -206,22 +218,26 @@ class Ruler():
         print('You are in year {} of your ten year rule.'.format(1+self.years_ruled))
         if self.plague_flag: 
             print('There was a terrible plague and half the population died.')
-        print('In the previous year {} people starved to death,'.format(self.num_deaths))
-        print('and {} people entered the kingdom.'.format(self.num_immigrants))
-        print('The population is now {}.'.format(self.population))
+        self.print_pop_summary()
         print('We harvested {} bushels at {} bushels per acre.'.format(self.harvested_bushels_per_acre*self.acres_planted, self.harvested_bushels_per_acre))
         print('Rats destroyed {} bushels, leaving {} bushels in storage.'.format(self.bushels_rats_ate, self.bushels_in_storage))
         print('The city owns {} acres of land.'.format(self.acres_of_land))
         print('Land is currently worth {} bushels per acre.'.format(self.price_of_land))
         print('')
     
+    def print_pop_summary(self):
+        print('In the previous year {} people starved to death,'.format(self.num_deaths))
+        print('and {} people entered the kingdom.'.format(self.num_immigrants))
+        print('The population is now {}.'.format(self.population))
+    
     def print_final_summary(self):
         print('\nO great {},'.format(self.name))
-        print('In your {}-year term of office, {:.2f} percent of the'.format(self.years_ruled,self.total_num_deaths/self.years_ruled))
+        self.print_pop_summary()
+        print('\nIn your {}-year term of office, {:.1f} percent of the'.format(self.years_ruled,self.percentage_death_rate))
         print('population starved per year on average, i.e., ')
         print('a total of {} people starved!'.format(self.total_num_deaths))
-        print('You started with 10 acres per person and ended with')
-        print('{:.2f} acres per person.\n'.format(self.acres_of_land/self.population))
+        print('You started with 10.0 acres per person and ended with')
+        print('{:.1f} acres per person.\n'.format(self.acres_of_land/self.population))
         
     def update_bushels_in_storage(self, amount):
         self.bushels_in_storage = int(self.bushels_in_storage+amount)
@@ -281,6 +297,8 @@ class Ruler():
             self.population -= self.num_deaths
             self.total_num_deaths += self.num_deaths
         
+        self.update_death_rate()
+        
         # Immigration
         if self.num_deaths > 0:
             self.num_immigrants = 0
@@ -289,6 +307,9 @@ class Ruler():
         self.population += self.num_immigrants
         
         return True # end of update population with success
+    
+    def update_death_rate(self):
+        self.percentage_death_rate = (self.years_ruled * self.percentage_death_rate + 100 * self.num_deaths/self.population) / (self.years_ruled+1)
         
     def update_harvest(self):
         yield_range = {'min':1, 'max':8}

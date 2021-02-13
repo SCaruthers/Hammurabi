@@ -84,7 +84,7 @@ def main():
         else:
             print(king.great_message)
         
-    print('\nTa ta for now.')
+    input('\nTa ta for now.')
 
 
 def welcome():

@@ -83,15 +83,16 @@ def main(king_name = None, term=None):
             print(king.so_so_message)
         else:
             print(king.great_message)
-        
-    input('\nTa ta for now.')
+
+    print('\a') # make sound
+    input('\nTa ta for now.')   # wait to close
 
 
 def welcome():
     message = '''
 \n\n\n
 Congratulations, you have been elected the ruler of ancient 
-Samaria. Your duties are to dispense food, direct farming,
+Babylon. Your duties are to dispense food, direct farming,
 and buy and sell land as needed to support your people. Watch
 out for rat infestations and the plague! Grain is the general currency,
 measured in bushels. The following will help you in your decisions:
@@ -176,7 +177,7 @@ def ask_how_much_to_plant(ruler):
 
     
 class Ruler():
-    """A class for the ruler of ancient Samaria."""
+    """A class for the ruler of ancient Babylon."""
     
     impeach_message ='Due to this extreme mismanagement you have not only\nbeen impeached and thrown out of office, but you have\nalso been declared "National Fink" !!'
     great_message = 'A fantastic performance!!!  Charlemange, Disraeli, and \nJefferson combined could not have done better!'
@@ -337,7 +338,7 @@ class Ruler():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-                    description = 'Hammurabi Game -- Rule Ancient Samaria in this text-based strategy game')
+                    description = 'Hammurabi Game -- Rule Ancient Babylon in this text-based strategy game')
     parser.add_argument('-n', '--name', 
                         help='The name of the ruler, defaults to "Hammurabi"', 
                         default = None)

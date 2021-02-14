@@ -93,7 +93,7 @@ def welcome():
 Congratulations, you are the newest ruler of ancient Samaria, elected
 for a ten year term of office. Your duties are to dispense food, direct
 farming, and buy and sell land as needed to support your people. Watch
-out for rat infestiations and the plague! Grain is the general currency,
+out for rat infestations and the plague! Grain is the general currency,
 measured in bushels. The following will help you in your decisions:
 
   * Each person needs at least 20 bushels of grain per year to survive.

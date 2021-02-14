@@ -198,6 +198,7 @@ class Ruler():
         self.population = 100
         self.acres_of_land = 1000
         self.price_of_land = 19            #bushels / acre
+        self.update_land_price()           # make it random to start with
         self.acres_planted = 1000
         self.years_ruled = 0
         self.in_office = True

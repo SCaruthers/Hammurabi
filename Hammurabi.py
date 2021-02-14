@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 
 import random
-#import string
+import argparse # command line arguments are handled in "if __name__" method at end
 
-def main():
 
+def main(king_name = None, term=None):
+
+    random.seed()
+    
     welcome()
     
-    king = Ruler()    
-    #king.print_summary()
-    
-    random.seed()
-    length_of_game = 10
+    king = Ruler(king_name, term)    
+
     # Start a 10 year rule:
-    while (king.in_office and king.years_ruled<length_of_game):
+    while (king.in_office and king.years_ruled<king.term):
         
         king.print_summary()
         # Ask 4 questions
@@ -90,9 +90,9 @@ def main():
 def welcome():
     message = '''
 \n\n\n
-Congratulations, you are the newest ruler of ancient Samaria, elected
-for a ten year term of office. Your duties are to dispense food, direct
-farming, and buy and sell land as needed to support your people. Watch
+Congratulations, you have been elected the ruler of ancient 
+Samaria. Your duties are to dispense food, direct farming,
+and buy and sell land as needed to support your people. Watch
 out for rat infestations and the plague! Grain is the general currency,
 measured in bushels. The following will help you in your decisions:
 
@@ -183,11 +183,15 @@ class Ruler():
     so_so_message = 'Your performance could have been somewhat better, but\nreally wasn\'t too bad at all. '+str(random.randint(2,14))+' people would\ndearly like to see you assassinated but we all have our\ntrivial problems.'
     bad_message = 'Your heavy-handed performance smacks of Nero and Ivan IV.\nThe people (remaining) find you an unpleasant ruler, \nand, frankly, hate your guts!'
     
-    def __init__(self, name=None):
+    def __init__(self, name=None, term=None):
         if name is None:
             self.name = 'Hammurabi'
         else:
             self.name = name
+        if term is None:
+            self.term = 10
+        else:
+            self.term = term
         self.bushels_in_storage = 2800
         self.harvested_bushels_per_acre = 3
         self.population = 100
@@ -215,7 +219,7 @@ class Ruler():
     
     def print_summary(self):
         print('\nO great {}!'.format(self.name))
-        print('You are in year {} of your ten year rule.'.format(1+self.years_ruled))
+        print('You are in year {} of your {} year rule.'.format(1+self.years_ruled, self.term))
         if self.plague_flag: 
             print('There was a terrible plague and half the population died.')
         self.print_pop_summary()
@@ -332,4 +336,14 @@ class Ruler():
         self.in_office = False
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+                    description = 'Hammurabi Game -- Rule Ancient Samaria in this text-based strategy game')
+    parser.add_argument('-n', '--name', 
+                        help='The name of the ruler, defaults to "Hammurabi"', 
+                        default = None)
+    parser.add_argument('-t','--term', 
+                        type=int,
+                        help='The duration of reign, defaults to 10 years', 
+                        default=None)
+    args = parser.parse_args()
+    main(king_name=args.name, term=args.term)

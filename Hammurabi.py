@@ -238,6 +238,8 @@ class Ruler():
     
     def print_final_summary(self):
         print('\nO great {},'.format(self.name))
+        if self.plague_flag: 
+            print('There was a terrible plague and half the population died.')
         self.print_pop_summary()
         print('\nIn your {}-year term of office, {:.1f} percent of the'.format(self.years_ruled,self.percentage_death_rate))
         print('population starved per year on average, i.e., ')

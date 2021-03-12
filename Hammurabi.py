@@ -88,10 +88,8 @@ def main(king_name = None, term=None):
     input('\nTa ta for now.')   # wait to close
 
 
-def welcome():
-    message = '''
-\n\n\n
-Congratulations, you have been elected the ruler of ancient 
+def welcome(to_print=True):
+    message = '''Congratulations, you have been elected the ruler of ancient 
 Babylon. Your duties are to dispense food, direct farming,
 and buy and sell land as needed to support your people. Watch
 out for rat infestations and the plague! Grain is the general currency,
@@ -106,9 +104,11 @@ measured in bushels. The following will help you in your decisions:
   * The market price for land fluctuates yearly.
 
 Rule wisely and you will be showered with appreciation at the end of
-your term. Rule poorly and you will be kicked out of office!
-'''
-    print(message)
+your term. Rule poorly and you will be kicked out of office!'''
+
+    if to_print: print('\n\n\n'+message+'\n')
+    
+    return message
 
 def input_int(prompt = ''):
     number = None
@@ -219,33 +219,51 @@ class Ruler():
         return message
         
     
-    def print_summary(self):
-        print('\nO great {}!'.format(self.name))
-        print('You are in year {} of your {} year rule.'.format(1+self.years_ruled, self.term))
+    def print_summary(self, mode = 'print'):
+        msg = 'O great {}!'.format(self.name)
+        msg += '\nYou are in year {} of your {} year rule.'.format(1+self.years_ruled, self.term)
         if self.plague_flag: 
-            print('There was a terrible plague and half the population died.')
-        self.print_pop_summary()
-        print('We harvested {} bushels at {} bushels per acre.'.format(self.harvested_bushels_per_acre*self.acres_planted, self.harvested_bushels_per_acre))
-        print('Rats destroyed {} bushels, leaving {} bushels in storage.'.format(self.bushels_rats_ate, self.bushels_in_storage))
-        print('The city owns {} acres of land.'.format(self.acres_of_land))
-        print('Land is currently worth {} bushels per acre.'.format(self.price_of_land))
-        print('')
+            msg += '\nThere was a terrible plague and half the population died.'
+        msg += self.print_pop_summary(mode)
+        msg += '\nWe harvested {} bushels at {} bushels per acre.'.format(self.harvested_bushels_per_acre*self.acres_planted, self.harvested_bushels_per_acre)
+        
+
+        
+        if mode.lower() == 'print':
+            msg += '\nRats destroyed {} bushels, leaving {} bushels in storage.'.format(self.bushels_rats_ate, self.bushels_in_storage)
+            msg += '\nThe city owns {} acres of land.'.format(self.acres_of_land)
+            msg += '\nLand is currently worth {} bushels per acre.'.format(self.price_of_land)
+            print('\n'+msg+'\n')
+        else:
+            msg += '\nRats destroyed {} bushels.'.format(self.bushels_rats_ate)
+            return msg
     
-    def print_pop_summary(self):
-        print('In the previous year {} people starved to death,'.format(self.num_deaths))
-        print('and {} people entered the kingdom.'.format(self.num_immigrants))
-        print('The population is now {}.'.format(self.population))
+    def print_pop_summary(self, mode = 'print'):
+        msg = '\nIn the previous year {} people starved to death,'.format(self.num_deaths)
+        msg += '\nand {} people entered the kingdom.'.format(self.num_immigrants)
+        
+        
+        if mode.lower() == 'print':
+            msg += '\nThe population is now {}.'.format(self.population)
+            return msg
+        else:
+            return msg
     
-    def print_final_summary(self):
-        print('\nO great {},'.format(self.name))
+    def print_final_summary(self, mode = 'print'):
+        msg = 'O great {},'.format(self.name)
         if self.plague_flag: 
-            print('There was a terrible plague and half the population died.')
-        self.print_pop_summary()
-        print('\nIn your {}-year term of office, {:.1f} percent of the'.format(self.years_ruled,self.percentage_death_rate))
-        print('population starved per year on average, i.e., ')
-        print('a total of {} people starved!'.format(self.total_num_deaths))
-        print('You started with 10.0 acres per person and ended with')
-        print('{:.1f} acres per person.\n'.format(self.acres_of_land/self.population))
+            msg += '\nThere was a terrible plague and half the population died.'
+        msg += self.print_pop_summary(mode = 'return')
+        msg += '\nIn your {}-year term of office, {:.1f} percent of the'.format(self.years_ruled,self.percentage_death_rate)
+        msg += '\npopulation starved per year on average, i.e., '
+        msg += '\na total of {} people starved!'.format(self.total_num_deaths)
+        msg += '\nYou started with 10.0 acres per person and ended with'
+        msg += '\n{:.1f} acres per person.\n'.format(self.acres_of_land/self.population)
+        
+        if mode.lower() == 'print':
+            print(msg)
+        else:
+            return msg
         
     def update_bushels_in_storage(self, amount):
         self.bushels_in_storage = int(self.bushels_in_storage+amount)
@@ -334,10 +352,14 @@ class Ruler():
         land_price_range = {'min':17, 'max':26}
         self.price_of_land = random.randint(land_price_range['min'],land_price_range['max'])
         
-    def impeach(self):
-        print('\n\n{}, You starved {} people in one year!!!'.format(self.name, self.num_deaths))
-        print(Ruler.impeach_message)
+    def impeach(self, quiet=False):
         self.in_office = False
+        msg = '{}, You starved {} people in one year!!!'.format(self.name, self.num_deaths) + '\n' + Ruler.impeach_message
+        if not quiet:
+            print('\n\n'+msg)
+        else:
+            return msg
+        
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

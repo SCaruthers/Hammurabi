@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import tkinter as tk
+import tkinter.font as tkFont
 import Hammurabi
 import random
 
@@ -8,7 +9,7 @@ import random
 BUY = +1
 SELL = -1
 
-WIN_W = 380
+WIN_W = 370
 WIN_H = 510
 
 class Welcome:
@@ -76,6 +77,9 @@ class GoPlay:
         
         self.oracle_text = tk.StringVar()   # Message to be displayed in bottom frame
         self.oracle_text.set(Hammurabi.welcome(to_print=False))
+        
+        default_font = tkFont.nametofont("TkDefaultFont")
+        default_font.configure(size=10)
         
         # top frame for data output
         self.frame_top = tk.LabelFrame(self.master, 
@@ -163,7 +167,7 @@ class GoPlay:
         self.val_landcost.grid(row=0, column=4, sticky = tk.W + tk.N)
         self.rbn_buy.grid(row=1, column=0, sticky=tk.W)
         self.rbn_sell.grid(row=1, column=1, sticky=tk.W)
-        self.val_landsale.grid(row=1, column=2, sticky=tk.E)
+        self.val_landsale.grid(row=1, column=2, sticky=tk.W)
         self.lbl_landsale.grid(row=1, column=3, sticky=tk.W)
         self.lbl_feed.grid(row=2, column=0, columnspan=2, sticky=tk.E)
         self.val_feed.grid(row=2, column=2, sticky=tk.W)
@@ -179,7 +183,8 @@ class GoPlay:
         self.lbl_oracle_msg = tk.Label(self.frame_bot, 
                                        textvariable = self.oracle_text,
                                        fg = '#40f',
-                                       wraplength=400, 
+                                       wraplength=400,
+                                       font=('TkDefaultFont',8),
                                        justify=tk.LEFT
                                        )
         
@@ -325,6 +330,8 @@ class GoPlay:
     def go_action(self):
         #msg = "You hit the GO button\nLand Exchange: {}\nFeed: {}\nPlant: {}".format(str(int(self.val_landsale.get())*int(self.bs.get())),self.val_feed.get(),self.plt.get())
         #self.oracle_text.set(msg)
+        
+        self.lbl_oracle_msg.config(font=('TkDefaultFont',10))
         
         msg = self.final_check()
         if msg != None:

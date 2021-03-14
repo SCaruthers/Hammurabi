@@ -2,6 +2,7 @@
 import tkinter as tk
 import tkinter.font as tkFont
 from tkinter import scrolledtext
+from tkinter import messagebox
 import Hammurabi
 import random
 
@@ -31,13 +32,27 @@ class Welcome:
         self.currentRuler.set('Hammurabi')
         self.my_name = tk.Entry(self.frame, textvariable = self.currentRuler, width = 20)
         self.button1 = tk.Button(self.frame, text = "Start", command = self.game_window)
+        self.helpBtn1 = tk.Button(self.frame, text = "Help", command = self.show_start_help)
         self.quitButton = tk.Button(self.frame, text = 'Quit', command = self.close_windows)
         self.l1.pack(pady=5)
         self.l2.pack()
         self.my_name.pack()
-        self.button1.pack(padx = 10, pady=10, side = tk.LEFT, fill = tk.X, expand = True)
-        self.quitButton.pack(padx = 10, pady=10, side = tk.RIGHT, fill = tk.X, expand = True)
+        self.button1.pack(padx = 5, pady=10, side = tk.LEFT, fill = tk.X, expand = True)
+        self.helpBtn1.pack(padx = 5, pady=10, side = tk.LEFT, fill = tk.X, expand = True)
+        self.quitButton.pack(padx = 5, pady=10, side = tk.RIGHT, fill = tk.X, expand = True)
         self.frame.pack(pady = 10)
+    
+    def show_start_help(self):
+        msg = '''        To play the game of Hammurabi,
+        Type your name in the box and click "Start".
+        
+        You will serve your term in office buying & selling land, 
+        planting & harvesting seed, and feeding your people.
+        
+        The default term is 10 years. If you want a different 
+        term, append it to the name with a # mark, followed 
+        by the number of years, as in Hammurabi#15'''
+        messagebox.Message(parent=self.master,title='Help',message=msg).show()
         
     def game_window(self):
         self.gameWindow = tk.Toplevel(self.master)
@@ -56,7 +71,11 @@ class GoPlay:
         global SELL
         self.master = master
         self.parent = parent
-        self.Ruler = Hammurabi.Ruler(ruler_name)
+        try:
+            rulerTerm = int(float(ruler_name.split('#')[1]))
+        except:
+            rulerTerm = 10
+        self.Ruler = Hammurabi.Ruler(ruler_name.split('#')[0], rulerTerm)
         
         self.master.protocol("WM_DELETE_WINDOW", self.close_windows)
         self.master.geometry('x'.join((str(WIN_W),str(WIN_H))))
@@ -232,11 +251,21 @@ class GoPlay:
         self.filemenu.add_command(label="View History", command=self.historyWin.deiconify)
         self.filemenu.add_command(label="Quit Reign", command=self.close_windows)
         self.filemenu.add_command(label="Quit Game", command=self.parent.destroy)
+        self.helpmenu = tk.Menu(self.menubar,tearoff=0)
+        self.helpmenu.add_command(label="Help", command=self.show_reign_help)
         self.menubar.add_cascade(label="File", menu=self.filemenu)
+        self.menubar.add_cascade(label="Help", menu=self.helpmenu)
         self.master.config(menu=self.menubar)
         
         
 
+    def show_reign_help(self):
+        self.reignHelpWin = tk.Toplevel(self.master)
+        self.reignHelpWin.title("Rules...")
+        self.historyWin.geometry('x'.join((str(WIN_W),str(WIN_H-265))))
+        self.historyWin.minsize(WIN_W, WIN_H-265)
+        self.historyWin.maxsize(WIN_W, WIN_H-265)
+        self.playHelpLbl = tk.Label(self.reignHelpWin, text = Hammurabi.welcome(to_print=False)).pack(padx=5,pady=5)
         
     def close_windows(self):
         self.master.destroy()

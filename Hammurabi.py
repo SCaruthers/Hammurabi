@@ -203,7 +203,7 @@ class Ruler():
         self.years_ruled = 0
         self.in_office = True
         self.num_immigrants = 5
-        self.bushels_fed = 0
+        self.bushels_fed = 1900
         self.num_deaths = 0
         self.total_num_deaths = 0
         self.percentage_death_rate = 0

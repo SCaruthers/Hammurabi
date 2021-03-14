@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import tkinter as tk
 import tkinter.font as tkFont
+from tkinter import scrolledtext
 import Hammurabi
 import random
 
@@ -62,6 +63,18 @@ class GoPlay:
         self.master.minsize(340, 250)
         self.master.maxsize(500,600)
         
+        # History Window will keep a running total of actions and results
+        # Be sure red 'X' doesn't destroy the window!
+        self.historyWin = tk.Toplevel(self.master)
+        self.historyWin.title("{}'s Record as Ruler".format(self.Ruler.name))
+        self.historyWin.protocol("WM_DELETE_WINDOW", self.historyWin.withdraw)
+        self.historyWin.geometry('x'.join((str(WIN_W+65),str(WIN_H-265))))
+        self.historyWin.minsize(WIN_W+50, WIN_H-320)
+        self.historyWin.maxsize(500,600)
+        hist_head = ('\t\t\t ----- G R A I N -----'+
+                    '\nYear\tPop\tAcres\tStored\t Fed \tHarvest'+
+                    '\n----\t---\t-----\t------\t-----\t-------')
+        
         # Set up some string variables to use as active labels
         self.yio = tk.StringVar()    #years in office
         self.pop = tk.StringVar()    #population
@@ -70,6 +83,9 @@ class GoPlay:
         self.ppa = tk.StringVar()    #price per acres
         self.plt = tk.StringVar()    #amount to plant
         self.plt.set('0')
+        self.hist = tk.StringVar()    #text for running history window
+        self.hist.set(hist_head)
+        
         self.update_labels()
         
         self.bs = tk.IntVar()        # value state for buying / selling land
@@ -155,7 +171,7 @@ class GoPlay:
                                   )
         
         self.quitButton = tk.Button(self.frame_mid, 
-                          text = 'Quit', 
+                          text = 'End', 
                           width = 8,
                           activebackground='red',
                           highlightcolor='red',
@@ -189,10 +205,37 @@ class GoPlay:
                                        )
         
         self.lbl_oracle_msg.grid(row=0, column=0, sticky=tk.N+tk.W)
-        #self.quitButton = tk.Button(self.frame_bot, text = 'Quit', command = self.close_windows)
+        
+        # Set up History Window with a frame and text for hist variable
+        self.label_hist = tk.Label(self.historyWin, 
+                                   text = "History for Ruler: "+self.Ruler.name,
+                                   font = ('TkDefaultFont',15)
+                                  )
+        hist_font = tkFont.nametofont('TkFixedFont')
+        self.hist_text_area = scrolledtext.ScrolledText(self.historyWin,
+                                                        width = 50,
+                                                        height = 10,
+                                                        font = hist_font,
+                                                       )
+        self.hist_text_area.insert('end',self.hist.get())
+        self.historyWin.grid_columnconfigure(0,weight=1)
+        self.historyWin.grid_rowconfigure(1,weight=1)
+        self.historyWin.resizable(width = True, height = True)
+        self.label_hist.grid(column=0,row=0, padx=10, pady=10, sticky=tk.W)
+        self.hist_text_area.grid(column=0, row=1, padx=10, pady=10, sticky=tk.W+tk.N+tk.E+tk.S)
+        self.hist_text_area.configure(state="disabled")
+        self.historyWin.withdraw()
 
-
-        #self.quitButton.pack(side=tk.RIGHT)
+        # Create a menu so user can pull up the History Window
+        self.menubar = tk.Menu(self.master)
+        self.filemenu = tk.Menu(self.menubar,tearoff=0)
+        self.filemenu.add_command(label="View History", command=self.historyWin.deiconify)
+        self.filemenu.add_command(label="Quit Reign", command=self.close_windows)
+        self.filemenu.add_command(label="Quit Game", command=self.parent.destroy)
+        self.menubar.add_cascade(label="File", menu=self.filemenu)
+        self.master.config(menu=self.menubar)
+        
+        
 
         
     def close_windows(self):
@@ -206,7 +249,15 @@ class GoPlay:
         self.grn.set(self.Ruler.bushels_in_storage) #grain in storage
         self.acr.set(self.Ruler.acres_of_land)      #acres owned
         self.ppa.set(self.Ruler.price_of_land)      #price per acres
+                    #  yio   pop   acr   grn    fed   harvest
+        hist_line = "\n{:3}\t{:5}\t{:5}\t{:6}\t{!s:5}\t{!s:5}".format(self.yio.get(),self.pop.get(),self.acr.get(),self.grn.get(),self.Ruler.bushels_fed, (self.Ruler.harvested_bushels_per_acre*self.Ruler.acres_planted))
         
+        self.hist.set(self.hist.get() + hist_line)
+        
+    def update_history_text(self):
+        self.hist_text_area.configure(state="normal")
+        self.hist_text_area.replace(1.0,'end',self.hist.get())
+        self.hist_text_area.configure(state="disabled")
         
     def bs_range(self):
         # set land sale limits accordingly, ignore feed and plant
@@ -358,6 +409,7 @@ class GoPlay:
         # Update the "dashboard" values and
         # Reset the choices back to 0's
         self.update_labels()
+        self.update_history_text()
         self.re_init_vals()
         
         # set the appropriate text, which depends on 
@@ -406,6 +458,7 @@ class GoPlay:
     def end_reign(self):
         # Disable all the widgets, especially "GO" button
         # Setting the oracle_text is not the responsibility of this function!
+        self.parent.bell()
         self.goButton.config(state=tk.DISABLED)
 
 def main(): 
